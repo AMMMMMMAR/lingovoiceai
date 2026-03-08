@@ -250,12 +250,12 @@ export default function Home() {
       <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none" />
 
       {/* Header */}
-      <header className="pt-10 pb-6 px-6 sm:px-10 max-w-5xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-[16px] bg-gradient-to-br from-[#003366] to-[#00509e] flex items-center justify-center text-white shadow-lg shadow-[#003366]/20">
-            <Waves className="w-7 h-7" strokeWidth={2.5} />
+      <header className="pt-6 sm:pt-10 pb-4 sm:pb-6 px-4 sm:px-10 max-w-5xl mx-auto flex items-center justify-between">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-[14px] sm:rounded-[16px] bg-gradient-to-br from-[#003366] to-[#00509e] flex items-center justify-center text-white shadow-lg shadow-[#003366]/20 shrink-0">
+            <Waves className="w-5 h-5 sm:w-7 sm:h-7" strokeWidth={2.5} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#003366]">LingoVoice AI</h1>
+          <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-[#003366]">LingoVoice AI</h1>
         </div>
 
         <div className="flex items-center gap-4">
@@ -266,7 +266,7 @@ export default function Home() {
               </span>
               <button
                 onClick={signOut}
-                className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-red-600 transition-colors bg-white/50 hover:bg-red-50 px-4 py-2 rounded-xl border border-slate-200 hover:border-red-200"
+                className="flex items-center gap-1.5 sm:gap-2 text-sm font-medium text-slate-600 hover:text-red-600 transition-colors bg-white/50 hover:bg-red-50 px-3 sm:px-4 py-2 rounded-xl border border-slate-200 hover:border-red-200"
               >
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">Sign Out</span>
@@ -275,7 +275,7 @@ export default function Home() {
           ) : (
             <a
               href="/login"
-              className="text-sm font-medium text-white bg-gradient-to-r from-[#003366] to-[#00509e] px-5 py-2 rounded-xl shadow-lg shadow-[#003366]/20 hover:shadow-[#003366]/30 hover:-translate-y-0.5 transition-all"
+              className="text-xs sm:text-sm font-medium text-white bg-gradient-to-r from-[#003366] to-[#00509e] px-4 sm:px-5 py-2 rounded-xl shadow-lg shadow-[#003366]/20 hover:shadow-[#003366]/30 hover:-translate-y-0.5 transition-all"
             >
               Sign In
             </a>
@@ -283,15 +283,15 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 sm:px-10 space-y-8 mt-4">
+      <main className="max-w-5xl mx-auto px-4 sm:px-10 space-y-6 sm:space-y-8 mt-2 sm:mt-4">
 
         {/* Main Generator Card */}
-        <div className="glass rounded-[2rem] p-6 sm:p-8 space-y-6">
-          <div className="space-y-4">
-            <div className="flex justify-between items-center text-sm font-medium text-slate-500">
-              <div className="flex items-center gap-4">
-                <span className="flex items-center gap-2"><FileText className="w-4 h-4" /> Text to Speech</span>
-                <button onClick={handleSurpriseMe} className="flex items-center gap-1.5 text-[#003366] hover:text-[#00509e] transition-colors bg-white/50 px-3 py-1 rounded-full border border-[#003366]/20 hover:border-[#003366]/40 shadow-sm"><Wand2 className="w-3.5 h-3.5" /> Surprise Me</button>
+        <div className="glass rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-8 space-y-4 sm:space-y-6">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-wrap justify-between items-center text-xs sm:text-sm font-medium text-slate-500 gap-2">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <span className="flex items-center gap-1.5 sm:gap-2"><FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> <span>Text to Speech</span></span>
+                <button onClick={handleSurpriseMe} className="flex items-center gap-1 sm:gap-1.5 text-[#003366] hover:text-[#00509e] transition-colors bg-white/50 px-2.5 sm:px-3 py-1 rounded-full border border-[#003366]/20 hover:border-[#003366]/40 shadow-sm"><Wand2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span>Surprise Me</span></button>
               </div>
               <span className={text.length >= 4500 ? "text-orange-500" : text.length >= 5000 ? "text-red-500 font-bold" : ""}>{text.length} / 5000</span>
             </div>
@@ -305,8 +305,8 @@ export default function Home() {
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between mt-2 sm:mt-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 flex-1">
               <div className="relative flex-1 sm:max-w-[200px]">
                 <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <select
@@ -367,7 +367,7 @@ export default function Home() {
             <button
               onClick={handleGenerate}
               disabled={isGenerating || !text.trim()}
-              className="bg-gradient-to-r from-[#003366] to-[#00509e] text-white px-8 py-3 rounded-xl font-medium shadow-lg shadow-[#003366]/30 hover:shadow-[#003366]/40 transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:pointer-events-none flex justify-center items-center gap-2"
+              className="bg-gradient-to-r from-[#003366] to-[#00509e] text-white px-8 py-3 sm:py-3 rounded-xl font-medium shadow-lg shadow-[#003366]/30 hover:shadow-[#003366]/40 transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:pointer-events-none flex justify-center items-center gap-2 w-full lg:w-auto mt-2 lg:mt-0"
             >
               {isGenerating ? (
                 <>
@@ -387,7 +387,7 @@ export default function Home() {
         {/* Dynamic Audio Player */}
         <div className={`transition-all duration-500 ease-in-out transform origin-top ${currentAudio ? 'opacity-100 scale-100 h-auto' : 'opacity-0 scale-95 h-0 overflow-hidden'}`}>
           {currentAudio && (
-            <div className="glass rounded-[1.5rem] p-4 px-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 border-l-4 border-l-[#003366]">
+            <div className="glass rounded-[1.25rem] sm:rounded-[1.5rem] p-3 sm:p-4 px-4 sm:px-6 flex flex-row items-center gap-3 sm:gap-6 border-l-4 border-l-[#003366]">
               <audio
                 ref={audioRef}
                 src={currentAudio.url}
@@ -401,9 +401,9 @@ export default function Home() {
 
               <button
                 onClick={togglePlay}
-                className="w-12 h-12 shrink-0 rounded-full bg-[#003366] text-white flex items-center justify-center hover:scale-105 transition-transform shadow-md"
+                className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-full bg-[#003366] text-white flex items-center justify-center hover:scale-105 transition-transform shadow-md"
               >
-                {isPlaying ? <Pause className="w-5 h-5 fill-white" /> : <Play className="w-5 h-5 fill-white ml-1" />}
+                {isPlaying ? <Pause className="w-4 h-4 sm:w-5 sm:h-5 fill-white" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-white ml-1" />}
               </button>
 
               <div className="flex-1 w-full flex flex-col gap-2">
@@ -427,10 +427,10 @@ export default function Home() {
                 download="voice.wav"
                 target="_blank"
                 rel="noreferrer"
-                className="shrink-0 w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:text-[#003366] hover:bg-[#003366]/5 transition-colors"
+                className="shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-slate-300 flex items-center justify-center text-slate-500 hover:text-[#003366] hover:bg-[#003366]/5 transition-colors"
                 title="Download Audio"
               >
-                <Download className="w-4 h-4 relative" />
+                <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 relative" />
               </a>
             </div>
           )}
@@ -468,110 +468,92 @@ export default function Home() {
                 <p className="text-sm mt-1">Generate your first audio to see it here.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[600px]">
-                  <thead>
-                    <tr className="bg-slate-50/50 text-sm font-semibold text-slate-500 border-b border-slate-200/60 font-medium">
-                      <th className="px-6 py-4 font-medium">Document</th>
-                      <th className="px-6 py-4 font-medium">Date Generated</th>
-                      <th className="px-6 py-4 font-medium">Accent Setting</th>
-                      <th className="px-6 py-4 font-medium">Voice</th>
-                      <th className="px-6 py-4 font-medium">Duration</th>
-                      <th className="px-6 py-4 font-medium text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100/80">
-                    {history.map((sessionItem) => (
-                      <tr key={sessionItem.id} className="hover:bg-white/40 transition-colors group">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-blue-50 text-blue-500 group-hover:bg-blue-100 transition-colors shrink-0">
-                              <FileText className="w-4 h-4" />
-                            </div>
-                            {editingTitleId === sessionItem.id ? (
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="text"
-                                  className="w-full min-w-[150px] px-2 py-1 text-sm border-b-2 border-[#003366]/50 bg-white/50 focus:outline-none focus:border-[#003366] text-slate-700 font-medium"
-                                  value={editingTitleValue}
-                                  onChange={(e) => setEditingTitleValue(e.target.value)}
-                                  autoFocus
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleUpdateTitle(sessionItem.id);
-                                    if (e.key === 'Escape') setEditingTitleId(null);
-                                  }}
-                                />
-                                <button disabled={isUpdating} onClick={() => handleUpdateTitle(sessionItem.id)} className="text-green-600 hover:text-green-700 hover:bg-green-50 p-1 rounded-md transition-colors"><Check className="w-4 h-4" /></button>
-                                <button disabled={isUpdating} onClick={() => setEditingTitleId(null)} className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-md transition-colors"><X className="w-4 h-4" /></button>
-                              </div>
-                            ) : (
-                              <div className="group/edit flex items-center gap-2 max-w-[200px]">
-                                <span className="font-medium text-slate-700 truncate" title={sessionItem.full_text}>
-                                  {sessionItem.title || 'Untitled Session'}
-                                </span>
-                                <button
-                                  onClick={() => {
-                                    setEditingTitleId(sessionItem.id);
-                                    setEditingTitleValue(sessionItem.title);
-                                  }}
-                                  className="opacity-0 group-hover/edit:opacity-100 text-slate-400 hover:text-[#003366] transition-opacity p-1"
-                                >
-                                  <Edit2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            )}
+              <div className="flex flex-col divide-y divide-slate-100/80">
+                {history.map((sessionItem) => (
+                  <div key={sessionItem.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 hover:bg-white/40 transition-colors gap-3 sm:gap-4 group">
+                    <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0 w-full">
+                      <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-blue-50 text-blue-500 group-hover:bg-blue-100 transition-colors shrink-0 mt-0.5 sm:mt-0">
+                        <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </div>
+                      <div className="flex flex-col gap-1 min-w-0 flex-1">
+                        {editingTitleId === sessionItem.id ? (
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              className="w-full min-w-[120px] px-2 py-1 text-sm border-b-2 border-[#003366]/50 bg-white/50 focus:outline-none focus:border-[#003366] text-slate-700 font-medium"
+                              value={editingTitleValue}
+                              onChange={(e) => setEditingTitleValue(e.target.value)}
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleUpdateTitle(sessionItem.id);
+                                if (e.key === 'Escape') setEditingTitleId(null);
+                              }}
+                            />
+                            <button disabled={isUpdating} onClick={() => handleUpdateTitle(sessionItem.id)} className="text-green-600 hover:text-green-700 hover:bg-green-50 p-1 rounded-md"><Check className="w-4 h-4" /></button>
+                            <button disabled={isUpdating} onClick={() => setEditingTitleId(null)} className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-md"><X className="w-4 h-4" /></button>
                           </div>
-                        </td>
-                        <td className="px-6 py-4 text-slate-500 text-sm">
-                          {formatDate(sessionItem.created_at)}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-600 border border-indigo-100">
-                            <Globe className="w-3 h-3 mr-1.5" />
-                            {LANGUAGES.find(l => l.id === sessionItem.lang_code)?.name || 'English (US)'}
+                        ) : (
+                          <div className="group/edit flex items-center gap-2">
+                            <span className="font-semibold text-slate-700 truncate text-sm sm:text-base" title={sessionItem.full_text}>
+                              {sessionItem.title || 'Untitled Session'}
+                            </span>
+                            <button
+                              onClick={() => {
+                                setEditingTitleId(sessionItem.id);
+                                setEditingTitleValue(sessionItem.title);
+                              }}
+                              className="opacity-0 group-hover/edit:opacity-100 text-slate-400 hover:text-[#003366] transition-opacity p-1"
+                            >
+                              <Edit2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                            </button>
+                          </div>
+                        )}
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] sm:text-xs text-slate-500">
+                          <span>{formatDate(sessionItem.created_at)}</span>
+                          <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-300"></span>
+                          <span className="flex items-center bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded border border-indigo-100">
+                            <Globe className="w-2.5 h-2.5 mr-1" />
+                            {LANGUAGES.find(l => l.id === sessionItem.lang_code)?.name?.split(' ')[0] || 'EN'}
                           </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                          <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-300"></span>
+                          <span className="truncate max-w-[120px] bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
                             {Object.values(VOICES).flat().find(v => v.id === sessionItem.voice_used)?.name?.split(' -')[0] || sessionItem.voice_used}
                           </span>
-                        </td>
-                        <td className="px-6 py-4 text-slate-500 text-sm">
-                          {formatDuration(sessionItem.duration_seconds)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => playHistoryAudio(sessionItem.audio_url)}
-                              className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#003366] hover:text-white transition-all shadow-sm"
-                              title="Play"
-                            >
-                              <Play className="w-3.5 h-3.5 ml-0.5" />
-                            </button>
-                            <a
-                              href={sessionItem.audio_url}
-                              download={`session-${sessionItem.id}.wav`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#003366] hover:border-[#003366] transition-all bg-white"
-                              title="Download"
-                            >
-                              <Download className="w-3.5 h-3.5" />
-                            </a>
-                            <div className="w-[1px] h-4 bg-slate-200 mx-1"></div>
-                            <button
-                              onClick={() => handleDeleteSession(sessionItem.id)}
-                              className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all"
-                              title="Delete Session"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                          <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-300"></span>
+                          <span>{formatDuration(sessionItem.duration_seconds)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0 bg-slate-50/50 sm:bg-transparent p-1 sm:p-0 rounded-lg sm:rounded-none w-full sm:w-auto justify-end mt-2 sm:mt-0">
+                      <button
+                        onClick={() => playHistoryAudio(sessionItem.audio_url)}
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full sm:rounded-xl bg-white sm:bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#003366] hover:text-white transition-all shadow-sm sm:shadow-none border border-slate-200 sm:border-transparent"
+                        title="Play"
+                      >
+                        <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-0.5" />
+                      </button>
+                      <a
+                        href={sessionItem.audio_url}
+                        download={`session-${sessionItem.id}.wav`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full sm:rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#003366] hover:border-[#003366] transition-all shadow-sm sm:shadow-none"
+                        title="Download"
+                      >
+                        <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      </a>
+                      <div className="w-[1px] h-4 bg-slate-200 mx-1 hidden sm:block"></div>
+                      <button
+                        onClick={() => handleDeleteSession(sessionItem.id)}
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full sm:rounded-xl bg-white sm:bg-transparent border border-slate-200 sm:border-transparent flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all shadow-sm sm:shadow-none"
+                        title="Delete Session"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
