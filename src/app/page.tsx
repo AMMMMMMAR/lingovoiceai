@@ -15,15 +15,29 @@ type Session = {
   created_at: string;
 };
 
-const VOICES = [
-  { id: 'af_heart', name: 'Bella - Soft & Clear (US Female)' },
-  { id: 'am_adam', name: 'Adam - Deep (US Male)' },
-  { id: 'af_bella', name: 'Bella - Alternate (US Female)' },
-  { id: 'am_michael', name: 'Michael - Clear (US Male)' }
+const LANGUAGES = [
+  { id: 'a', name: 'English (US)' },
+  { id: 'b', name: 'British English (UK)' }
 ];
+
+const VOICES: Record<string, { id: string, name: string }[]> = {
+  a: [
+    { id: 'af_heart', name: 'Bella - Soft & Clear (US Female)' },
+    { id: 'am_adam', name: 'Adam - Deep (US Male)' },
+    { id: 'af_bella', name: 'Bella - Alternate (US Female)' },
+    { id: 'am_michael', name: 'Michael - Clear (US Male)' }
+  ],
+  b: [
+    { id: 'bf_emma', name: 'Emma - Clear (UK Female)' },
+    { id: 'bm_george', name: 'George - Deep (UK Male)' },
+    { id: 'bf_isabella', name: 'Isabella - Soft (UK Female)' },
+    { id: 'bm_lewis', name: 'Lewis - Clear (UK Male)' }
+  ]
+};
 
 export default function Home() {
   const [text, setText] = useState('');
+  const [language, setLanguage] = useState('a');
   const [voice, setVoice] = useState('af_heart');
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentAudio, setCurrentAudio] = useState<{ url: string, sessionId?: string } | null>(null);
@@ -68,6 +82,7 @@ export default function Home() {
         body: JSON.stringify({
           text,
           voice_id: voice,
+          lang_code: language,
           speed: 1.0
         })
       });
@@ -175,10 +190,17 @@ export default function Home() {
               <div className="relative flex-1 sm:max-w-[200px]">
                 <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <select
-                  className="w-full appearance-none bg-white rounded-xl py-3 pl-10 pr-10 border border-slate-200 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 cursor-pointer shadow-sm disabled:opacity-50"
-                  disabled
+                  className="w-full appearance-none bg-white rounded-xl py-3 pl-10 pr-10 border border-slate-200 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 cursor-pointer shadow-sm"
+                  value={language}
+                  onChange={(e) => {
+                    const newLang = e.target.value;
+                    setLanguage(newLang);
+                    setVoice(VOICES[newLang][0].id);
+                  }}
                 >
-                  <option value="en-us">English (US)</option>
+                  {LANGUAGES.map(l => (
+                    <option key={l.id} value={l.id}>{l.name}</option>
+                  ))}
                 </select>
                 <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                   <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -192,7 +214,7 @@ export default function Home() {
                   value={voice}
                   onChange={(e) => setVoice(e.target.value)}
                 >
-                  {VOICES.map(v => (
+                  {VOICES[language]?.map(v => (
                     <option key={v.id} value={v.id}>{v.name}</option>
                   ))}
                 </select>
@@ -324,7 +346,7 @@ export default function Home() {
                         </td>
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-                            {VOICES.find(v => v.id === session.voice_used)?.name?.split(' -')[0] || session.voice_used}
+                            {Object.values(VOICES).flat().find(v => v.id === session.voice_used)?.name?.split(' -')[0] || session.voice_used}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-slate-500 text-sm">
