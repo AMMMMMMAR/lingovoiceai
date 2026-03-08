@@ -12,7 +12,7 @@ const SAMPLE_TEXTS = [
   "Welcome to LingoVoice AI! I'm here to bring your words to life. Try typing something else to hear how I sound."
 ];
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
 
 type Session = {
   id: string;
