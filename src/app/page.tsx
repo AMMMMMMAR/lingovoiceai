@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Waves, Play, Pause, Download, Loader2, FileText, Volume2, Globe } from 'lucide-react';
+import { Waves, Play, Pause, Download, Loader2, FileText, Volume2, Globe, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const API_BASE = "http://localhost:8000";
 
@@ -45,14 +46,21 @@ export default function Home() {
   const [history, setHistory] = useState<Session[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
+  const { session, user, signOut, isLoading: isAuthLoading } = useAuth();
+
   // Audio Player State
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const fetchHistory = async () => {
+    if (!session?.access_token) return;
     try {
-      const res = await fetch(`${API_BASE}/history`);
+      const res = await fetch(`${API_BASE}/history`, {
+        headers: {
+          "Authorization": `Bearer ${session.access_token}`
+        }
+      });
       if (res.ok) {
         const data = await res.json();
         setHistory(data);
@@ -65,8 +73,10 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchHistory();
-  }, []);
+    if (session?.access_token) {
+      fetchHistory();
+    }
+  }, [session?.access_token]);
 
   const handleGenerate = async () => {
     if (!text.trim()) return;
@@ -76,9 +86,14 @@ export default function Home() {
     setProgress(0);
 
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch(`${API_BASE}/generate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           text,
           voice_id: voice,
@@ -93,7 +108,9 @@ export default function Home() {
       }
       const data = await res.json();
       setCurrentAudio({ url: data.audio_url, sessionId: data.session_id });
-      fetchHistory(); // refresh history
+      if (session?.access_token) {
+        fetchHistory(); // refresh history only if logged in
+      }
     } catch (e: any) {
       console.error(e);
       alert(`Error generating audio: ${e.message}`);
@@ -149,6 +166,14 @@ export default function Home() {
     }, 100);
   };
 
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f8f9fa] to-[#e9ecef]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#003366]" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pb-20 font-sans selection:bg-[#003366] selection:text-white">
       {/* Background Decor */}
@@ -163,6 +188,30 @@ export default function Home() {
             <Waves className="w-7 h-7" strokeWidth={2.5} />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-[#003366]">LingoVoice AI</h1>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {user ? (
+            <>
+              <span className="hidden sm:inline-block text-sm font-medium text-slate-600 bg-white/50 px-3 py-1.5 rounded-full border border-slate-200">
+                {user.email}
+              </span>
+              <button
+                onClick={signOut}
+                className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-red-600 transition-colors bg-white/50 hover:bg-red-50 px-4 py-2 rounded-xl border border-slate-200 hover:border-red-200"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
+            </>
+          ) : (
+            <a
+              href="/login"
+              className="text-sm font-medium text-white bg-gradient-to-r from-[#003366] to-[#00509e] px-5 py-2 rounded-xl shadow-lg shadow-[#003366]/20 hover:shadow-[#003366]/30 hover:-translate-y-0.5 transition-all"
+            >
+              Sign In
+            </a>
+          )}
         </div>
       </header>
 
@@ -303,10 +352,21 @@ export default function Home() {
           </h2>
 
           <div className="glass rounded-2xl overflow-hidden shadow-sm">
-            {isLoadingHistory ? (
+            {isLoadingHistory && user ? (
               <div className="p-8 text-center text-slate-500 flex flex-col items-center gap-3">
                 <Loader2 className="w-6 h-6 animate-spin" />
                 <p>Loading your sessions...</p>
+              </div>
+            ) : !user ? (
+              <div className="p-10 text-center text-slate-500 bg-white/40">
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 shadow-sm">
+                  <FileText className="w-8 h-8 text-[#003366]/40" />
+                </div>
+                <h3 className="text-xl font-semibold text-slate-700 mb-2">Sign in to save your history</h3>
+                <p className="text-sm text-slate-500 max-w-sm mx-auto mb-6">Create an account or sign in to keep track of your generated voices and download them anytime.</p>
+                <a href="/login" className="inline-flex items-center gap-2 text-sm font-medium bg-[#003366] text-white px-6 py-2.5 rounded-xl hover:bg-[#002244] transition-colors shadow-md">
+                  Sign In / Sign Up
+                </a>
               </div>
             ) : history.length === 0 ? (
               <div className="p-10 text-center text-slate-500">
