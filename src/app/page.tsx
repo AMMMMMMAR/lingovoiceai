@@ -1,8 +1,16 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Waves, Play, Pause, Download, Loader2, FileText, Volume2, Globe, LogOut, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Waves, Play, Pause, Download, Loader2, FileText, Volume2, Globe, LogOut, Trash2, Edit2, Check, X, Wand2, Settings2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+
+const SAMPLE_TEXTS = [
+  "The quick brown fox jumps over the lazy dog, demonstrating the clarity of this AI voice.",
+  "Did you know that honey never spoils? Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still perfectly safe to eat.",
+  "Deep in the enchanted forest, a mysterious glowing light danced between the ancient oak trees, guiding the lost traveler back to the path.",
+  "Welcome to LingoVoice AI! I'm here to bring your words to life. Try typing something else to hear how I sound."
+];
 
 const API_BASE = "http://localhost:8000";
 
@@ -41,6 +49,7 @@ export default function Home() {
   const [text, setText] = useState('');
   const [language, setLanguage] = useState('a');
   const [voice, setVoice] = useState('af_heart');
+  const [speed, setSpeed] = useState(1.0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentAudio, setCurrentAudio] = useState<{ url: string, sessionId?: string } | null>(null);
 
@@ -56,6 +65,12 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  const handleSurpriseMe = () => {
+    const randomText = SAMPLE_TEXTS[Math.floor(Math.random() * SAMPLE_TEXTS.length)];
+    setText(randomText);
+    toast.success("Sample text loaded!");
+  };
 
   const fetchHistory = async () => {
     if (!session?.access_token) return;
@@ -91,12 +106,13 @@ export default function Home() {
       if (res.ok) {
         setHistory(prev => prev.map(s => s.id === id ? { ...s, title: editingTitleValue.trim() } : s));
         setEditingTitleId(null);
+        toast.success("Title updated!");
       } else {
-        alert("Failed to update title");
+        toast.error("Failed to update title");
       }
     } catch (e) {
       console.error(e);
-      alert("Error updating title");
+      toast.error("Error updating title");
     } finally {
       setIsUpdating(false);
     }
@@ -113,12 +129,13 @@ export default function Home() {
       });
       if (res.ok) {
         setHistory(prev => prev.filter(s => s.id !== id));
+        toast.success("Session deleted");
       } else {
-        alert("Failed to delete session");
+        toast.error("Failed to delete session");
       }
     } catch (e) {
       console.error(e);
-      alert("Error deleting session");
+      toast.error("Error deleting session");
     }
   };
 
@@ -148,7 +165,7 @@ export default function Home() {
           text,
           voice_id: voice,
           lang_code: language,
-          speed: 1.0
+          speed: speed
         })
       });
 
@@ -161,9 +178,10 @@ export default function Home() {
       if (session?.access_token) {
         fetchHistory(); // refresh history only if logged in
       }
+      toast.success("Audio generated successfully!");
     } catch (e: any) {
       console.error(e);
-      alert(`Error generating audio: ${e.message}`);
+      toast.error(`Error generating audio: ${e.message}`);
     } finally {
       setIsGenerating(false);
     }
@@ -271,8 +289,11 @@ export default function Home() {
         <div className="glass rounded-[2rem] p-6 sm:p-8 space-y-6">
           <div className="space-y-4">
             <div className="flex justify-between items-center text-sm font-medium text-slate-500">
-              <span className="flex items-center gap-2"><FileText className="w-4 h-4" /> Text to Speech</span>
-              <span className={text.length >= 5000 ? "text-red-500" : ""}>{text.length} / 5000</span>
+              <div className="flex items-center gap-4">
+                <span className="flex items-center gap-2"><FileText className="w-4 h-4" /> Text to Speech</span>
+                <button onClick={handleSurpriseMe} className="flex items-center gap-1.5 text-[#003366] hover:text-[#00509e] transition-colors bg-white/50 px-3 py-1 rounded-full border border-[#003366]/20 hover:border-[#003366]/40 shadow-sm"><Wand2 className="w-3.5 h-3.5" /> Surprise Me</button>
+              </div>
+              <span className={text.length >= 4500 ? "text-orange-500" : text.length >= 5000 ? "text-red-500 font-bold" : ""}>{text.length} / 5000</span>
             </div>
 
             <textarea
@@ -309,6 +330,7 @@ export default function Home() {
               <div className="relative flex-1 sm:max-w-[280px]">
                 <Volume2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <select
+                  aria-label="Select voice"
                   className="w-full appearance-none bg-white rounded-xl py-3 pl-10 pr-10 border border-slate-200 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 cursor-pointer shadow-sm"
                   value={voice}
                   onChange={(e) => setVoice(e.target.value)}
@@ -316,6 +338,25 @@ export default function Home() {
                   {VOICES[language]?.map(v => (
                     <option key={v.id} value={v.id}>{v.name}</option>
                   ))}
+                </select>
+                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                  <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+              </div>
+
+              <div className="relative flex-1 sm:max-w-[120px]">
+                <Settings2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <select
+                  aria-label="Select speed"
+                  className="w-full appearance-none bg-white rounded-xl py-3 pl-10 pr-10 border border-slate-200 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#003366]/50 cursor-pointer shadow-sm"
+                  value={speed}
+                  onChange={(e) => setSpeed(parseFloat(e.target.value))}
+                >
+                  <option value={0.5}>0.5x</option>
+                  <option value={0.75}>0.75x</option>
+                  <option value={1}>1.0x</option>
+                  <option value={1.25}>1.25x</option>
+                  <option value={1.5}>1.5x</option>
                 </select>
                 <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                   <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
