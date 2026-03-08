@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Waves, Play, Pause, Download, Loader2, FileText, Volume2, Globe, LogOut } from 'lucide-react';
+import { Waves, Play, Pause, Download, Loader2, FileText, Volume2, Globe, LogOut, Trash2, Edit2, Check, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const API_BASE = "http://localhost:8000";
@@ -11,6 +11,7 @@ type Session = {
   title: string;
   full_text: string;
   voice_used: string;
+  lang_code?: string;
   audio_url: string;
   duration_seconds: number;
   created_at: string;
@@ -45,6 +46,9 @@ export default function Home() {
 
   const [history, setHistory] = useState<Session[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [editingTitleId, setEditingTitleId] = useState<string | null>(null);
+  const [editingTitleValue, setEditingTitleValue] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const { session, user, signOut, isLoading: isAuthLoading } = useAuth();
 
@@ -69,6 +73,52 @@ export default function Home() {
       console.error("Failed to fetch history", e);
     } finally {
       setIsLoadingHistory(false);
+    }
+  };
+
+  const handleUpdateTitle = async (id: string) => {
+    if (!editingTitleValue.trim() || !session?.access_token) return;
+    setIsUpdating(true);
+    try {
+      const res = await fetch(`${API_BASE}/history/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ title: editingTitleValue.trim() })
+      });
+      if (res.ok) {
+        setHistory(prev => prev.map(s => s.id === id ? { ...s, title: editingTitleValue.trim() } : s));
+        setEditingTitleId(null);
+      } else {
+        alert("Failed to update title");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error updating title");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeleteSession = async (id: string) => {
+    if (!session?.access_token || !confirm("Are you sure you want to delete this audio session?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/history/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+      if (res.ok) {
+        setHistory(prev => prev.filter(s => s.id !== id));
+      } else {
+        alert("Failed to delete session");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error deleting session");
     }
   };
 
@@ -383,47 +433,83 @@ export default function Home() {
                     <tr className="bg-slate-50/50 text-sm font-semibold text-slate-500 border-b border-slate-200/60 font-medium">
                       <th className="px-6 py-4 font-medium">Document</th>
                       <th className="px-6 py-4 font-medium">Date Generated</th>
+                      <th className="px-6 py-4 font-medium">Accent Setting</th>
                       <th className="px-6 py-4 font-medium">Voice</th>
                       <th className="px-6 py-4 font-medium">Duration</th>
                       <th className="px-6 py-4 font-medium text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100/80">
-                    {history.map((session) => (
-                      <tr key={session.id} className="hover:bg-white/40 transition-colors group">
+                    {history.map((sessionItem) => (
+                      <tr key={sessionItem.id} className="hover:bg-white/40 transition-colors group">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-blue-50 text-blue-500 group-hover:bg-blue-100 transition-colors">
+                            <div className="p-2 rounded-lg bg-blue-50 text-blue-500 group-hover:bg-blue-100 transition-colors shrink-0">
                               <FileText className="w-4 h-4" />
                             </div>
-                            <span className="font-medium text-slate-700 truncate max-w-[200px]" title={session.full_text}>
-                              {session.title || 'Untitled Session'}
-                            </span>
+                            {editingTitleId === sessionItem.id ? (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  className="w-full min-w-[150px] px-2 py-1 text-sm border-b-2 border-[#003366]/50 bg-white/50 focus:outline-none focus:border-[#003366] text-slate-700 font-medium"
+                                  value={editingTitleValue}
+                                  onChange={(e) => setEditingTitleValue(e.target.value)}
+                                  autoFocus
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleUpdateTitle(sessionItem.id);
+                                    if (e.key === 'Escape') setEditingTitleId(null);
+                                  }}
+                                />
+                                <button disabled={isUpdating} onClick={() => handleUpdateTitle(sessionItem.id)} className="text-green-600 hover:text-green-700 hover:bg-green-50 p-1 rounded-md transition-colors"><Check className="w-4 h-4" /></button>
+                                <button disabled={isUpdating} onClick={() => setEditingTitleId(null)} className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-md transition-colors"><X className="w-4 h-4" /></button>
+                              </div>
+                            ) : (
+                              <div className="group/edit flex items-center gap-2 max-w-[200px]">
+                                <span className="font-medium text-slate-700 truncate" title={sessionItem.full_text}>
+                                  {sessionItem.title || 'Untitled Session'}
+                                </span>
+                                <button
+                                  onClick={() => {
+                                    setEditingTitleId(sessionItem.id);
+                                    setEditingTitleValue(sessionItem.title);
+                                  }}
+                                  className="opacity-0 group-hover/edit:opacity-100 text-slate-400 hover:text-[#003366] transition-opacity p-1"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4 text-slate-500 text-sm">
-                          {formatDate(session.created_at)}
+                          {formatDate(sessionItem.created_at)}
                         </td>
                         <td className="px-6 py-4">
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-                            {Object.values(VOICES).flat().find(v => v.id === session.voice_used)?.name?.split(' -')[0] || session.voice_used}
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-600 border border-indigo-100">
+                            <Globe className="w-3 h-3 mr-1.5" />
+                            {LANGUAGES.find(l => l.id === sessionItem.lang_code)?.name || 'English (US)'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                            {Object.values(VOICES).flat().find(v => v.id === sessionItem.voice_used)?.name?.split(' -')[0] || sessionItem.voice_used}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-slate-500 text-sm">
-                          {formatDuration(session.duration_seconds)}
+                          {formatDuration(sessionItem.duration_seconds)}
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <button
-                              onClick={() => playHistoryAudio(session.audio_url)}
+                              onClick={() => playHistoryAudio(sessionItem.audio_url)}
                               className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#003366] hover:text-white transition-all shadow-sm"
                               title="Play"
                             >
                               <Play className="w-3.5 h-3.5 ml-0.5" />
                             </button>
                             <a
-                              href={session.audio_url}
-                              download={`session-${session.id}.wav`}
+                              href={sessionItem.audio_url}
+                              download={`session-${sessionItem.id}.wav`}
                               target="_blank"
                               rel="noreferrer"
                               className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#003366] hover:border-[#003366] transition-all bg-white"
@@ -431,6 +517,14 @@ export default function Home() {
                             >
                               <Download className="w-3.5 h-3.5" />
                             </a>
+                            <div className="w-[1px] h-4 bg-slate-200 mx-1"></div>
+                            <button
+                              onClick={() => handleDeleteSession(sessionItem.id)}
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all"
+                              title="Delete Session"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </div>
                         </td>
                       </tr>
